@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./multitenant-db-data:/var/lib/postgresql/data
+      - multitenant-db-data:/var/lib/postgresql/data
   keycloak-db:
     image: "postgres:latest"
     container_name: "keycloak-db"
@@ -23,7 +23,7 @@ services:
     ports:
       - "9432:5432"
     volumes:
-      - ./keycloak-db-data:/var/lib/postgresql/data
+      - keycloak-db-data:/var/lib/postgresql/data
   keycloak:
     image: "quay.io/keycloak/keycloak:latest"
     container_name: "keycloak"
@@ -41,3 +41,6 @@ services:
       - start-dev
     ports:
       - "9090:8080"
+volumes:
+  multitenant-db-data: { }
+  keycloak-db-data: { } 

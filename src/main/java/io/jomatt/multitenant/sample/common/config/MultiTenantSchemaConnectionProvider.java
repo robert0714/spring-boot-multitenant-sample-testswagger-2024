@@ -3,11 +3,16 @@ package io.jomatt.multitenant.sample.common.config;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import io.quantics.multitenant.tenantdetails.TenantSchemaDetails;
+import io.quantics.multitenant.tenantdetails.TenantSchemaDetailsService;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Provider that provides tenant-specific connection handling in a multi-tenant application. The tenant
@@ -16,16 +21,21 @@ import java.sql.SQLException;
  */
 @Component
 @Slf4j
-public class MultiTenantSchemaConnectionProvider implements MultiTenantConnectionProvider {
+public class MultiTenantSchemaConnectionProvider implements MultiTenantConnectionProvider<String> {
 
-    private final DataSource dataSource;
+    private final DataSource dataSource; 
+    private Map<String,String>  tenantSchemaCache ; 
+     
+	public MultiTenantSchemaConnectionProvider(DataSource dataSource ) {
+		this.dataSource = dataSource; 
+	} 
+	@Autowired
+	@Lazy
+	public void setTenantSchemaCache(Map<String, String> tenantSchemaCache) {
+		this.tenantSchemaCache = tenantSchemaCache;
+	}
 
-    @Autowired
-    public MultiTenantSchemaConnectionProvider(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    @Override
+	@Override
     public Connection getAnyConnection() throws SQLException {
         return dataSource.getConnection();
     }
@@ -38,8 +48,14 @@ public class MultiTenantSchemaConnectionProvider implements MultiTenantConnectio
     @Override
     public Connection getConnection(String tenantIdentifier) throws SQLException {
         log.trace("Get connection for tenant '{}'", tenantIdentifier);
+        String  tenantSchema  = null;
+        if(this.tenantSchemaCache!=null) {
+        	tenantSchema= this.tenantSchemaCache.get(tenantIdentifier);
+        } 
+        var schema = tenantSchema != null ? tenantSchema : CurrentTenantResolver.DEFAULT_SCHEMA;        
         final Connection connection = getAnyConnection();
-        connection.setSchema(tenantIdentifier);
+        log.info("DB vender '{}'", connection.getMetaData().getDatabaseProductName());
+        connection.setSchema(schema);
         return connection;
     }
 

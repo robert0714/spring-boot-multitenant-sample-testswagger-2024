@@ -16,6 +16,8 @@ public class FlywayConfig {
 
     private final boolean outOfOrder;
     private final boolean baselineOnMigrate;
+    private static final String DEFAULT_MIGRATION_LOCATION = "db/migration/default";
+    private static final String TENANT_MIGRATION_LOCATION = "db/migration/tenant";
 
     public FlywayConfig(@Value("${spring.flyway.out-of-order:false}") boolean outOfOrder,
                         @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate) {
@@ -28,7 +30,7 @@ public class FlywayConfig {
         Flyway flyway = Flyway.configure()
                 .outOfOrder(outOfOrder)
                 .baselineOnMigrate(baselineOnMigrate)
-                .locations("db/migration/default")
+                .locations(DEFAULT_MIGRATION_LOCATION)
                 .dataSource(dataSource)
                 .schemas(CurrentTenantResolver.DEFAULT_SCHEMA)
                 .load();
@@ -44,7 +46,7 @@ public class FlywayConfig {
             Flyway flyway = Flyway.configure()
                     .outOfOrder(outOfOrder)
                     .baselineOnMigrate(baselineOnMigrate)
-                    .locations("db/migration/tenants")
+                    .locations(TENANT_MIGRATION_LOCATION)
                     .dataSource(dataSource)
                     .schemas(tenant.getSchema())
                     .load();

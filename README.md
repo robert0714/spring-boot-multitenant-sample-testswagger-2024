@@ -15,3 +15,15 @@ There are two working examples in this repo which can be activated via Spring pr
 The code in this repository accompanies the following blog posts:
 - [How to build a multi-tenant SaaS solution: A Spring Boot sample app](https://jomatt.io/how-to-build-a-multi-tenant-saas-solution-sample-app/)
 - [How to make your multi-tenant Spring app production-ready](https://jomatt.io/how-to-make-your-multi-tenant-spring-app-production-ready/)
+
+## test
+```bash
+java -jar target/spring-boot-multitenant-sample-0.1.0.jar
+```
+
+## prod
+```bash
+java -jar target/spring-boot-multitenant-sample-0.1.0.jar --spring.profiles.active=prod
+```
+* dukes tenant: Log in with `isabelle/password`. 
+* beans tenant: Log in with `bjorn/password`.  
