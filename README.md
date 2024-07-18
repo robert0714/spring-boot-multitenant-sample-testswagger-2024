@@ -27,3 +27,13 @@ java -jar target/spring-boot-multitenant-sample-0.1.0.jar --spring.profiles.acti
 ```
 * dukes tenant: Log in with `isabelle/password`. 
 * beans tenant: Log in with `bjorn/password`.  
+
+
+
+
+
+## Unit test
+```bash
+mvn clean test -Dtest="io.jomatt.multitenant.sample.header.MultiTenantHeaderApplicationTests"
+mvn clean test -Dtest="io.jomatt.multitenant.sample.jwt.MultiTenantJwtApplicationTests"
+```

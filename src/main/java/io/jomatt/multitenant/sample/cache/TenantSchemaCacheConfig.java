@@ -29,9 +29,11 @@ public class TenantSchemaCacheConfig {
 	
 	@EventListener(ApplicationReadyEvent.class)
 	public void loadData() { 
-		TenantContext.setTenantId(CurrentTenantResolver.DEFAULT_SCHEMA);
+		TenantContext.setTenantId(CurrentTenantResolver.DEFAULT_SCHEMA); 
 		tenantService.getAll().forEach(tenant -> {
 			cache.put(tenant.getId(), tenant.getSchema());
+			System.out.println("----------------------------------------------");
+			System.out.println(tenant.getSchema());
 			 
         }); 
 		TenantContext.clear();

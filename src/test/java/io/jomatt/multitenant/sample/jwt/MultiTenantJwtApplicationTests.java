@@ -1,5 +1,7 @@
 package io.jomatt.multitenant.sample.jwt;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,11 +12,15 @@ import org.springframework.lang.NonNull;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ActiveProfiles; 
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import io.jomatt.multitenant.sample.common.user.User;
+import io.jomatt.multitenant.sample.common.user.UserRepository;
+import io.quantics.multitenant.TenantContext; 
 
 import java.time.Instant;
 import java.util.List;
@@ -25,11 +31,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+ 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "prod", "test" })
 @AutoConfigureMockMvc
-@Sql(scripts = { "/create-tenants.sql", "/insert-data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = { "/insert-data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = { "/delete-data.sql" }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class MultiTenantJwtApplicationTests {
 
@@ -39,7 +45,41 @@ public class MultiTenantJwtApplicationTests {
 
     @Autowired
     private MockMvc mvc;
+    
+    @Autowired
+    private UserRepository userRepository; 
+    
+    @BeforeEach
+    protected void setUp() throws Exception { 
+    	Thread.sleep(1000L);
+    	
+    	TenantContext.setTenantId("tenant1");
+		if (this.userRepository.count() == 0) {
+			var alice = new User("alice");
+			var alex = new User("alex"); 
+			this.userRepository.saveAll(List.of(alice, alex));
+		}
+		TenantContext.clear();
 
+		TenantContext.setTenantId("tenant2");
+		if (this.userRepository.count() == 0) {
+			var bob = new User("bob");
+			var bella = new User("bella"); 
+			this.userRepository.saveAll(List.of(bob, bella  ));
+		}
+		TenantContext.clear();
+    }
+    @AfterEach
+    protected void teardown() throws Exception { 
+//    	Thread.sleep(1000L);
+//    	TenantContext.setTenantId("tenant1");
+//    	this.userRepository.deleteAll(); 
+//		TenantContext.clear();
+//
+//		TenantContext.setTenantId("tenant2");
+//		this.userRepository.deleteAll(); 
+//		TenantContext.clear();
+    }
     @MockBean
     private JwtDecoder jwtDecoder;
 

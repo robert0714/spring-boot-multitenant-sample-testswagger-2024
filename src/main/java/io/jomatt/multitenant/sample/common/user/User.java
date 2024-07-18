@@ -17,8 +17,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "usr")
-public class User {
-	public User(){}
+public class User { 
     @Id
     @NotNull
     @Column(name = "name", updatable = false, nullable = false, unique = true)
